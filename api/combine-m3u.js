@@ -1,0 +1,20 @@
+export default async function handler(req, res) {
+    const urls = [
+        "https://raw.githubusercontent.com/pigzillaaaaa/iptv-scraper/refs/heads/main/daddylive-channels-kodi.m3u8",
+        "https://premiumm3u.vercel.app/CIGNAL.m3u"
+    ];
+
+    try {
+        const responses = await Promise.all(urls.map(url => fetch(url).then(res => res.text())));
+        let combinedM3U = "#EXTM3U\n";
+
+        responses.forEach(content => {
+            combinedM3U += content.replace(/^#EXTM3U\s*/, ""); // Remove extra #EXTM3U headers
+        });
+
+        res.setHeader("Content-Type", "application/vnd.apple.mpegurl");
+        res.status(200).send(combinedM3U);
+    } catch (error) {
+        res.status(500).json({ error: "Failed to fetch M3U files" });
+    }
+}
