@@ -1,7 +1,7 @@
 export default async function handler(req, res) {
     const urls = [
-        "https://premiumm3u.vercel.app/moveonjoy.m3u8","https://premiumm3u.vercel.app/CIGNAL.m3u","https://premiumm3u.vercel.app/Jungo.m3u",
-        "https://iptv-scraper-re.vercel.app/pixelsport","https://raw.githubusercontent.com/nero31994/PLUTO/27f2fb78218684c0f9f0e38ea7f4e6d656fc7832/pluto","https://premiumm3u.vercel.app/daddylive.m3u","https://premiumm3u.vercel.app/hbogoasia.m3u",
+        "https://premiumm3u.vercel.app/CIGNAL.m3u","https://premiumm3u.vercel.app/Jungo.m3u",
+        "https://iptv-scraper-re.vercel.app/pixelsport","https://raw.githubusercontent.com/nero31994/PLUTO/27f2fb78218684c0f9f0e38ea7f4e6d656fc7832/pluto","https://premiumm3u.vercel.app/daddylive.m3u","https://premiumm3u.vercel.app/hbogoasia.m3u","https://premiumm3u.vercel.app/moveonjoy.m3u8",
     ];
 
     try {
