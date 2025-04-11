@@ -5,7 +5,7 @@ export default async function handler(req, res) {
         "https://premiumm3u.vercel.app/Jungo.m3u",     
         "https://iptv-scraper-re.vercel.app/streameast",
         "https://raw.githubusercontent.com/pigzillaaaaa/iptv-scraper/refs/heads/main/daddylive-channels.m3u8",
-        "https://premiumm3u.vercel.app/hbogoasia.m3u",
+        ,
     ];
 
     const controller = new AbortController();
