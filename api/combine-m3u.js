@@ -1,12 +1,10 @@
-import { Resend } from 'resend';
-
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export default async function handler(req, res) {
     const userAgent = req.headers["user-agent"] || "";
 
+    // Only allow if user-agent contains 'm3u-ip.tv'
     const isAllowed = userAgent.includes("m3u-ip.tv");
 
+    // Block known command-line tools or dev environments
     const blockedAgents = [
         "curl", "wget", "httpie", "postman", "http-client", "termux", "okhttp", "python-requests", "axios", "node-fetch"
     ];
@@ -15,29 +13,13 @@ export default async function handler(req, res) {
         userAgent.toLowerCase().includes(agent)
     );
 
+    // Optionally block requests with suspicious headers often used by dev tools
     const suspiciousHeaders = [
         "Postman-Token", "Insomnia", "Sec-Fetch-Mode", "Sec-Fetch-Site", "Sec-Fetch-Dest", "X-Requested-With"
     ];
     const hasSuspiciousHeader = suspiciousHeaders.some(h => h.toLowerCase() in req.headers);
 
     if (!isAllowed || isBlockedTool || hasSuspiciousHeader) {
-        // Email notification for blocked access
-        try {
-            await resend.emails.send({
-                from: 'M3U Security <security@m3u-ip.tv>',
-                to: 'arenaofvalorph937@gmail.com',
-                subject: 'Blocked Access Attempt Detected',
-                html: `
-                    <h2>Unauthorized Attempt</h2>
-                    <p><strong>User-Agent:</strong> ${userAgent}</p>
-                    <p><strong>IP Address:</strong> ${req.headers['x-forwarded-for'] || req.socket.remoteAddress}</p>
-                    <p><strong>Time:</strong> ${new Date().toLocaleString()}</p>
-                `,
-            });
-        } catch (emailError) {
-            console.error("Failed to send alert email:", emailError);
-        }
-
         return res.status(403).json({ error: "Access denied. Unauthorized client." });
     }
 
@@ -51,7 +33,7 @@ export default async function handler(req, res) {
     ];
 
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 8000);
+    const timeout = setTimeout(() => controller.abort(), 8000); // 8 seconds timeout
 
     try {
         const responses = await Promise.allSettled(
@@ -61,7 +43,7 @@ export default async function handler(req, res) {
         clearTimeout(timeout);
 
         let combinedM3U = "#EXTM3U\n";
-        const seenLines = new Set();
+        const seenLines = new Set(); // Deduplication
 
         for (const result of responses) {
             if (result.status === "fulfilled" && result.value) {
@@ -72,7 +54,7 @@ export default async function handler(req, res) {
         }
 
         res.setHeader("Content-Type", "application/vnd.apple.mpegurl");
-        res.setHeader("Cache-Control", "public, max-age=300");
+        res.setHeader("Cache-Control", "public, max-age=300"); // Cache for 5 minutes
         res.status(200).send(combinedM3U);
     } catch (error) {
         res.status(500).json({ error: "Failed to fetch M3U files" });
