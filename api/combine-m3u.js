@@ -1,16 +1,26 @@
 export default async function handler(req, res) {
     const userAgent = req.headers["user-agent"] || "";
 
-    // Allow specific IPTV client
-    const allowedAgents = ["m3u-ip.tv"];
-    const isAllowed = allowedAgents.some(agent => userAgent.includes(agent));
+    // Only allow if user-agent contains 'm3u-ip.tv'
+    const isAllowed = userAgent.includes("m3u-ip.tv");
 
-    // Block if it's a browser and not in allowed list
-    const browserAgents = ["Mozilla", "Chrome", "Safari", "Edge", "Gecko", "Firefox"];
-    const isBrowser = browserAgents.some(agent => userAgent.includes(agent));
+    // Block known command-line tools or dev environments
+    const blockedAgents = [
+        "curl", "wget", "httpie", "postman", "http-client", "termux", "okhttp", "python-requests", "axios", "node-fetch"
+    ];
 
-    if (isBrowser && !isAllowed) {
-        return res.status(403).json({ error: "Tanginamo" });
+    const isBlockedTool = blockedAgents.some(agent =>
+        userAgent.toLowerCase().includes(agent)
+    );
+
+    // Optionally block requests with suspicious headers often used by dev tools
+    const suspiciousHeaders = [
+        "Postman-Token", "Insomnia", "Sec-Fetch-Mode", "Sec-Fetch-Site", "Sec-Fetch-Dest", "X-Requested-With"
+    ];
+    const hasSuspiciousHeader = suspiciousHeaders.some(h => h.toLowerCase() in req.headers);
+
+    if (!isAllowed || isBlockedTool || hasSuspiciousHeader) {
+        return res.status(403).json({ error: "Access denied. Unauthorized client." });
     }
 
     const urls = [
