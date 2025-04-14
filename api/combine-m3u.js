@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     const isBrowser = browserAgents.some(agent => userAgent.includes(agent));
 
     if (isBrowser && !isAllowed) {
-        return res.status(403).json({ error: "Browser access is restricted for M3U downloads." });
+        return res.status(403).json({ error: "Tanginamo" });
     }
 
     const urls = [
