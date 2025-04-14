@@ -1,4 +1,12 @@
 export default async function handler(req, res) {
+    const userAgent = req.headers["user-agent"] || "";
+
+    // Block common browsers by checking User-Agent
+    const browserAgents = ["Mozilla", "Chrome", "Safari", "Edge", "Gecko", "Firefox"];
+    if (browserAgents.some(agent => userAgent.includes(agent))) {
+        return res.status(403).json({ error: "Nginx" });
+    }
+
     const urls = [
         "https://premiumm3u.vercel.app/converge.m3u",
         "https://premiumm3u.vercel.app/CIGNAL.m3u",
@@ -6,7 +14,6 @@ export default async function handler(req, res) {
         "https://iptv-scraper-re.vercel.app/streameast",
         "https://raw.githubusercontent.com/nero31994/pluto2/refs/heads/main/filtered_playlist.m3u",
         "https://raw.githubusercontent.com/pigzillaaaaa/iptv-scraper/refs/heads/main/daddylive-channels.m3u8",
-        
     ];
 
     const controller = new AbortController();
