@@ -1,10 +1,16 @@
 export default async function handler(req, res) {
     const userAgent = req.headers["user-agent"] || "";
 
-    // Block common browsers by checking User-Agent
+    // Allow specific IPTV client
+    const allowedAgents = ["m3u-ip.tv"];
+    const isAllowed = allowedAgents.some(agent => userAgent.includes(agent));
+
+    // Block if it's a browser and not in allowed list
     const browserAgents = ["Mozilla", "Chrome", "Safari", "Edge", "Gecko", "Firefox"];
-    if (browserAgents.some(agent => userAgent.includes(agent))) {
-        return res.status(403).json({ error: "Nginx" });
+    const isBrowser = browserAgents.some(agent => userAgent.includes(agent));
+
+    if (isBrowser && !isAllowed) {
+        return res.status(403).json({ error: "Browser access is restricted for M3U downloads." });
     }
 
     const urls = [
