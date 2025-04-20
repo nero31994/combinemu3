@@ -24,7 +24,7 @@ export default async function handler(req, res) {
     }
 
     const urls = [
-        
+        "https://premiumm3u.vercel.app/NXB.m3u",
         "https://premiumm3u.vercel.app/Cignalconverge.m3u",
         "https://premiumm3u.vercel.app/Jungo.m3u",     
         "https://iptv-scraper-re.vercel.app/streameast",
