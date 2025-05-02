@@ -33,7 +33,7 @@ export default async function handler(req, res) {
         "https://premiumm3u.vercel.app/Jungo.m3u",
         "https://raw.githubusercontent.com/pigzillaaaaa/iptv-scraper/refs/heads/main/thetvapp.m3u8",
         "https://raw.githubusercontent.com/nero31994/pluto2/refs/heads/main/filtered_playlist.m3u",
-        "https://premiumm3u.vercel.app/hbogoasia.m3u",
+        "https://premiumm3u.vercel.app/hbogoasia.m3u","https://m3u.ch/pl/1c29d8cc8f75cae84309f32b8a71e7a9_7c127718ce467dfe3416c8bfc9773cf1.m3u",
     ];
 
     const controller = new AbortController();
