@@ -33,6 +33,7 @@ export default async function handler(req, res) {
         "https://premiumm3u.vercel.app/Jungo.m3u",
         "https://raw.githubusercontent.com/pigzillaaaaa/iptv-scraper/refs/heads/main/thetvapp.m3u8",
         "https://raw.githubusercontent.com/nero31994/pluto2/refs/heads/main/filtered_playlist.m3u",
+        "https://raw.githubusercontent.com/nero31994/iptv-scraper/refs/heads/main/daddylive-channels.m3u8",
         "https://premiumm3u.vercel.app/hbogoasia.m3u","https://premiumm3u.vercel.app/182405.m3u",
     ];
 
