@@ -34,7 +34,8 @@ export default async function handler(req, res) {
         "https://raw.githubusercontent.com/pigzillaaaaa/iptv-scraper/refs/heads/main/thetvapp.m3u8",
         "https://raw.githubusercontent.com/nero31994/pluto2/refs/heads/main/filtered_playlist.m3u",
         "https://raw.githubusercontent.com/nero31994/iptv-scraper/refs/heads/main/daddylive-channels.m3u8",
-        "https://premiumm3u.vercel.app/hbogoasia.m3u","https://premiumm3u.vercel.app/182405.m3u",
+        "https://premiumm3u.vercel.app/hbogoasia.m3u",
+        "https://premiumm3u.vercel.app/182405.m3u"
     ];
 
     const controller = new AbortController();
@@ -49,7 +50,7 @@ export default async function handler(req, res) {
 
         clearTimeout(timeout);
 
-        let combinedM3U = "#EXTM3U\n";
+        let combinedM3U = '#EXTM3U url-tvg="https://github.com/atone77721/CIGNAL_EPG/raw/refs/heads/main/merged_epg.xml.gz https://raw.githubusercontent.com/atone77721/CIGNAL_EPG/refs/heads/main/sky_epg.xml https://github.com/atone77721/CIGNAL_EPG/raw/refs/heads/main/sky_epg.xml.gz"\n';
         const seenLines = new Set();
 
         for (const result of responses) {
