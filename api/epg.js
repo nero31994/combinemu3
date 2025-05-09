@@ -7,7 +7,6 @@ const epgUrls = [
   "https://github.com/atone77721/CIGNAL_EPG/raw/refs/heads/main/merged_epg.xml.gz",
   "https://raw.githubusercontent.com/atone77721/CIGNAL_EPG/refs/heads/main/merged_epg.xml",
   "https://raw.githubusercontent.com/atone77721/CIGNAL_EPG/refs/heads/main/sky_epg.xml",
-  "https://raw.githubusercontent.com/nero31994/iptv-scraper/refs/heads/main/epgs/daddylive-channels-epg.xml",
   "https://github.com/matthuisman/i.mjh.nz/raw/master/PlutoTV/us.xml.gz",
   "https://github.com/atone77721/CIGNAL_EPG/raw/refs/heads/main/sky_epg.xml.gz"
 ];
