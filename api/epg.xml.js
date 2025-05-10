@@ -12,6 +12,13 @@ const epgUrls = [
 ];
 
 export default async function handler(req, res) {
+  const userAgent = req.headers['user-agent'] || '';
+
+  if (userAgent !== 'm3u-ip.tv') {
+    res.status(403).send('Access denied');
+    return;
+  }
+
   try {
     let xmlParts = [];
 
@@ -32,7 +39,6 @@ export default async function handler(req, res) {
       }
     }
 
-    // Combine XML content, stripping duplicates and merging <channel> and <programme> entries only
     let mergedChannels = new Set();
     let mergedProgrammes = [];
 
@@ -51,7 +57,6 @@ export default async function handler(req, res) {
       }
     }
 
-    // Build final merged XML
     let mergedXml = '<?xml version="1.0" encoding="UTF-8"?>\n<tv>\n';
     mergedXml += [...mergedChannels].join('\n') + '\n';
     mergedXml += mergedProgrammes.join('\n') + '\n';
