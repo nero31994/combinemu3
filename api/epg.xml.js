@@ -1,9 +1,7 @@
 import { gunzip } from 'zlib';
 import { promisify } from 'util';
-import { XMLParser } from 'fast-xml-parser';
 
 const gunzipAsync = promisify(gunzip);
-const parser = new XMLParser({ ignoreAttributes: false });
 
 const epgUrls = [
   "https://github.com/atone77721/CIGNAL_EPG/raw/refs/heads/main/merged_epg.xml.gz",
@@ -13,18 +11,9 @@ const epgUrls = [
   "https://github.com/atone77721/CIGNAL_EPG/raw/refs/heads/main/sky_epg.xml.gz"
 ];
 
-function escapeXml(str) {
-  return str.replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&apos;');
-}
-
 export default async function handler(req, res) {
   try {
-    let allChannels = new Set();
-    let allProgrammes = [];
+    let xmlParts = [];
 
     for (const url of epgUrls) {
       const response = await fetch(url);
@@ -32,47 +21,47 @@ export default async function handler(req, res) {
 
       const buffer = await response.arrayBuffer();
       const isGz = url.endsWith(".gz");
-      const content = isGz
-        ? await gunzipAsync(Buffer.from(buffer))
-        : Buffer.from(buffer);
 
-      const xml = content.toString();
-      let parsed;
-      try {
-        parsed = parser.parse(xml);
-      } catch (err) {
-        continue; // skip invalid XML
-      }
-
-      if (parsed.tv?.channel) {
-        const channels = Array.isArray(parsed.tv.channel) ? parsed.tv.channel : [parsed.tv.channel];
-        channels.forEach(ch => {
-          const chStr = `<channel id="${escapeXml(ch["@_id"])}">${ch.display_name ? `<display-name>${escapeXml(ch.display_name)}</display-name>` : ''}</channel>`;
-          allChannels.add(chStr);
-        });
-      }
-
-      if (parsed.tv?.programme) {
-        const programmes = Array.isArray(parsed.tv.programme) ? parsed.tv.programme : [parsed.tv.programme];
-        programmes.forEach(pg => {
-          const attrs = Object.entries(pg)
-            .filter(([key]) => key.startsWith("@_"))
-            .map(([k, v]) => `${k.slice(2)}="${escapeXml(v)}"`).join(" ");
-          const title = pg.title ? `<title>${escapeXml(pg.title)}</title>` : '';
-          allProgrammes.push(`<programme ${attrs}>${title}</programme>`);
-        });
+      let content;
+      if (isGz) {
+        content = await gunzipAsync(Buffer.from(buffer));
+        xmlParts.push(content.toString("utf-8"));
+      } else {
+        content = Buffer.from(buffer).toString("utf-8");
+        xmlParts.push(content);
       }
     }
 
-    let xmlOutput = `<?xml version="1.0" encoding="UTF-8"?>\n<tv>\n`;
-    xmlOutput += Array.from(allChannels).join("\n") + "\n";
-    xmlOutput += allProgrammes.join("\n") + "\n</tv>";
+    // Combine XML content, stripping duplicates and merging <channel> and <programme> entries only
+    let mergedChannels = new Set();
+    let mergedProgrammes = [];
 
-    res.setHeader("Content-Type", "application/xml");
+    for (const xml of xmlParts) {
+      const cleanXml = xml.replace(/<\?xml[^>]*\?>/, '').replace(/<\/?tv>/g, '').trim();
+
+      const channelMatches = [...cleanXml.matchAll(/<channel[^>]*>[\s\S]*?<\/channel>/g)];
+      const programmeMatches = [...cleanXml.matchAll(/<programme[^>]*>[\s\S]*?<\/programme>/g)];
+
+      for (const match of channelMatches) {
+        mergedChannels.add(match[0]);
+      }
+
+      for (const match of programmeMatches) {
+        mergedProgrammes.push(match[0]);
+      }
+    }
+
+    // Build final merged XML
+    let mergedXml = '<?xml version="1.0" encoding="UTF-8"?>\n<tv>\n';
+    mergedXml += [...mergedChannels].join('\n') + '\n';
+    mergedXml += mergedProgrammes.join('\n') + '\n';
+    mergedXml += '</tv>';
+
+    res.setHeader("Content-Type", "application/xml; charset=utf-8");
     res.setHeader("Cache-Control", "public, max-age=300");
-    res.status(200).send(xmlOutput);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('<?xml version="1.0" encoding="UTF-8"?><tv></tv>');
+    res.status(200).send(mergedXml);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to merge EPGs" });
   }
 }
