@@ -32,23 +32,21 @@ export default async function handler(req, res) {
       }
     }
 
-    // Combine all <programme> and <channel> nodes under a single <tv> root
+    // Combine all <programme> and <channel> nodes under one <tv> root
     let merged = '<?xml version="1.0" encoding="UTF-8"?>\n<tv>\n';
     for (const xml of xmlParts) {
-      // Clean the xml content by removing the existing <tv> tags and XML declaration
       const content = xml
-        .replace(/<\?xml[^>]*\?>/, '') // Remove XML declaration
-        .replace(/<\/?tv>/g, ''); // Remove <tv> tags
+        .replace(/<\?xml[^>]*\?>/, '')
+        .replace(/<\/?tv>/g, '');
       merged += content.trim() + '\n';
     }
     merged += '</tv>';
 
-    // Return the merged EPG as a valid XML response
     res.setHeader("Content-Type", "application/xml");
     res.setHeader("Cache-Control", "public, max-age=300");
     res.status(200).send(merged);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Failed to merge EPGs" });
+    res.status(500).send('<?xml version="1.0" encoding="UTF-8"?><tv></tv>');
   }
 }
