@@ -14,7 +14,7 @@ const epgUrls = [
 export default async function handler(req, res) {
   const userAgent = req.headers['user-agent'] || '';
 
-  if (userAgent !== 'm3u-ip.tv') {
+  if (userAgent !== 'Mozilla/5.0 (m3u-ip.tv 3.0.1) Android') {
     res.status(403).send('Access denied');
     return;
   }
