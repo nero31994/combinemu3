@@ -50,7 +50,7 @@ export default async function handler(req, res) {
 
         clearTimeout(timeout);
 
-        let combinedM3U = '#EXTM3U url-tvg="https://github.com/atone77721/CIGNAL_EPG/raw/refs/heads/main/merged_epg.xml.gz https://raw.githubusercontent.com/atone77721/CIGNAL_EPG/refs/heads/main/sky_epg.xml https://github.com/atone77721/CIGNAL_EPG/raw/refs/heads/main/sky_epg.xml.gz"\n';
+        let combinedM3U = '#EXTM3U url-tvg="https://epgnxb.vercel.app/api/epg.js"\n';
         const seenLines = new Set();
 
         for (const result of responses) {
