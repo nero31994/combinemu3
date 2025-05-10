@@ -11,25 +11,8 @@ const epgUrls = [
   "https://github.com/atone77721/CIGNAL_EPG/raw/refs/heads/main/sky_epg.xml.gz"
 ];
 
-const allowedHost = 'm3u-ip.tv';
-const allowedPort = '443';
-
 export default async function handler(req, res) {
   try {
-    // Block if host is not m3u-ip.tv:443
-    const hostHeader = req.headers.host || '';
-    if (!hostHeader.startsWith(`${allowedHost}:${allowedPort}`)) {
-      return res.status(403).send('Forbidden: Host not allowed');
-    }
-
-    // Optionally block suspicious User-Agents (dev tools, bots, browsers)
-    const userAgent = req.headers['user-agent']?.toLowerCase() || '';
-    const blockedUserAgents = ['mozilla', 'chrome', 'safari', 'firefox', 'edge', 'opera', 'postman', 'curl', 'wget'];
-
-    if (blockedUserAgents.some(agent => userAgent.includes(agent))) {
-      return res.status(403).send('Forbidden: User-Agent not allowed');
-    }
-
     let xmlParts = [];
 
     for (const url of epgUrls) {
@@ -49,7 +32,7 @@ export default async function handler(req, res) {
       }
     }
 
-    // Merge logic
+    // Combine XML content, stripping duplicates and merging <channel> and <programme> entries only
     let mergedChannels = new Set();
     let mergedProgrammes = [];
 
@@ -68,6 +51,7 @@ export default async function handler(req, res) {
       }
     }
 
+    // Build final merged XML
     let mergedXml = '<?xml version="1.0" encoding="UTF-8"?>\n<tv>\n';
     mergedXml += [...mergedChannels].join('\n') + '\n';
     mergedXml += mergedProgrammes.join('\n') + '\n';
